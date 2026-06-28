@@ -44,14 +44,14 @@
     }
 
     .hero {
-      height: 47vh;
-      min-height: 355px;
-      max-height: 470px;
+      height: 31svh;
+      min-height: 218px;
+      max-height: 300px;
       color: white;
       background:
         radial-gradient(circle at 20% 15%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
         linear-gradient(135deg, #ff5743 0%, #ff285d 48%, #f21562 100%);
-      padding: calc(18px + var(--safe-top)) 22px 0;
+      padding: calc(8px + var(--safe-top)) 20px 0;
       position: relative;
       overflow: hidden;
     }
@@ -72,7 +72,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 48px;
+      height: 42px;
       position: relative;
       z-index: 2;
     }
@@ -80,7 +80,7 @@
     .menu-btn, .ghost-btn {
       position: absolute;
       left: 0;
-      top: 4px;
+      top: 0;
       width: 44px;
       height: 44px;
       border: 0;
@@ -108,7 +108,7 @@
 
     h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 22px;
       line-height: 1.15;
       letter-spacing: .2px;
       font-weight: 800;
@@ -121,10 +121,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: calc(100% - 80px);
-      font-size: clamp(76px, 22vw, 116px);
+      height: calc(100% - 50px);
+      font-size: clamp(62px, 19vw, 94px);
       font-weight: 300;
-      letter-spacing: -5px;
+      letter-spacing: -3px;
       font-variant-numeric: tabular-nums;
       text-shadow: 0 12px 30px rgba(148, 18, 56, .15);
     }
@@ -132,9 +132,9 @@
     .sheet {
       background: #fff;
       border-radius: 22px 22px 0 0;
-      margin-top: -58px;
-      min-height: calc(53vh + 58px);
-      padding: 86px 24px calc(20px + var(--safe-bottom));
+      margin-top: -42px;
+      min-height: calc(69svh + 42px);
+      padding: 62px 20px calc(12px + var(--safe-bottom));
       position: relative;
       z-index: 3;
       box-shadow: 0 -10px 22px rgba(43, 20, 35, .03);
@@ -155,8 +155,8 @@
     }
 
     .play-btn {
-      width: 96px;
-      height: 96px;
+      width: 78px;
+      height: 78px;
       border-radius: 50%;
       border: 0;
       background: #fff;
@@ -181,10 +181,10 @@
 
     .reset-btn {
       position: absolute;
-      right: 22px;
-      top: -28px;
-      width: 58px;
-      height: 58px;
+      right: 18px;
+      top: -20px;
+      width: 54px;
+      height: 54px;
       border-radius: 19px;
       border: 0;
       background: rgba(255,255,255,.95);
@@ -197,9 +197,9 @@
 
     .phase-line {
       text-align: center;
-      margin-top: -34px;
-      margin-bottom: 18px;
-      height: 32px;
+      margin-top: -24px;
+      margin-bottom: 10px;
+      height: 26px;
       color: #7a7a84;
       font-size: 15px;
       font-weight: 700;
@@ -207,19 +207,24 @@
 
     .phase-line strong { color: var(--text); }
 
-    .card-list { display: grid; gap: 12px; }
+    .card-list { display: grid; gap: 10px; }
 
     .card {
-      height: 84px;
+      height: 72px;
       border-radius: var(--card-radius);
-      padding: 0 26px 0 28px;
+      padding: 0 22px 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
       overflow: hidden;
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      cursor: pointer;
+      user-select: none;
     }
+
+    .card:active { transform: scale(.992); }
+    .card:focus-visible { outline: 3px solid rgba(255,47,103,.28); outline-offset: 3px; }
 
     .card.disabled { background: #eeeeef; color: #9b9ba2; }
     .card.work { background: var(--green-bg); }
@@ -255,7 +260,7 @@
     }
 
     .card-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       letter-spacing: -.5px;
       white-space: nowrap;
@@ -272,7 +277,7 @@
     }
 
     .card-value {
-      font-size: 28px;
+      font-size: 25px;
       line-height: 1;
       font-weight: 800;
       letter-spacing: -1px;
@@ -289,7 +294,7 @@
     .card.disabled .card-title { color: #8d8d93; }
 
     .progress-note {
-      margin: 16px 2px 0;
+      margin: 10px 2px 0;
       color: #858590;
       font-size: 14px;
       text-align: center;
@@ -313,7 +318,7 @@
       z-index: 21;
       background: #fff;
       border-radius: 26px 26px 0 0;
-      padding: 18px 22px calc(20px + var(--safe-bottom));
+      padding: 16px 20px calc(18px + var(--safe-bottom));
       transform: translateY(110%);
       transition: transform .24s ease;
       max-height: 86vh;
@@ -343,7 +348,7 @@
       grid-template-columns: 1fr auto;
       align-items: center;
       gap: 16px;
-      min-height: 64px;
+      min-height: 58px;
       border-bottom: 1px solid #efeff2;
     }
 
@@ -352,6 +357,16 @@
       font-weight: 700;
       color: #2d2d34;
     }
+
+    .setting.focused {
+      margin: 6px -8px;
+      padding: 0 8px;
+      border-radius: 18px;
+      background: #fff3f6;
+      border-bottom-color: transparent;
+      box-shadow: inset 0 0 0 2px rgba(255,47,103,.12);
+    }
+
 
     .stepper {
       display: flex;
@@ -415,7 +430,7 @@
     }
 
     .preset {
-      height: 48px;
+      height: 42px;
       border-radius: 15px;
       border: 0;
       background: #f4f4f6;
@@ -443,16 +458,28 @@
 
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    @media (max-width: 380px) {
-      .hero { min-height: 330px; }
-      .sheet { padding-left: 16px; padding-right: 16px; }
-      .card { height: 76px; padding-left: 20px; padding-right: 20px; }
-      .card-title { font-size: 21px; }
-      .card-value { font-size: 25px; }
-      h1 { font-size: 21px; }
-      .play-wrap { width: 112px; height: 112px; top: -56px; }
-      .play-btn { width: 84px; height: 84px; }
-      .total-time { letter-spacing: -3px; }
+    @media (max-width: 380px), (max-height: 760px) {
+      .hero { min-height: 200px; height: 29svh; }
+      .sheet { margin-top: -36px; padding: 54px 14px calc(8px + var(--safe-bottom)); }
+      .card-list { gap: 8px; }
+      .card { height: 66px; padding-left: 18px; padding-right: 18px; border-radius: 16px; }
+      .card-content { gap: 14px; }
+      .icon { width: 28px; height: 28px; flex-basis: 28px; }
+      .icon svg { width: 28px; height: 28px; }
+      .card-title { font-size: 19px; }
+      .card-value { font-size: 22px; }
+      h1 { font-size: 20px; }
+      .topbar { height: 38px; }
+      .total-time { font-size: clamp(56px, 18vw, 82px); letter-spacing: -2px; }
+      .play-wrap { width: 92px; height: 92px; top: -46px; }
+      .play-btn { width: 70px; height: 70px; }
+      .reset-btn { width: 48px; height: 48px; border-radius: 16px; }
+      .phase-line { margin-top: -20px; margin-bottom: 8px; font-size: 14px; height: 22px; }
+      .progress-note { margin-top: 8px; font-size: 13px; }
+    }
+
+    @media (display-mode: standalone) {
+      .hero { height: 32svh; min-height: 230px; }
     }
   </style>
 </head>
@@ -482,15 +509,7 @@
       <div class="phase-line" id="phaseLine">Готово к тренировке</div>
 
       <div class="card-list">
-        <article class="card disabled" id="historyCard">
-          <div class="card-content">
-            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4.5 9h15M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span class="card-title">Загрузить Предыдущие Трениров...</span>
-          </div>
-          <span class="card-value">»</span>
-        </article>
-
-        <article class="card work" id="card-work">
+        <article class="card work" id="card-work" role="button" tabindex="0" data-open-setting="work">
           <div class="card-content">
             <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.4"/><path d="M10 8.8v6.4l5-3.2-5-3.2z" fill="currentColor"/></svg></span>
             <span class="card-title">Работа</span>
@@ -498,7 +517,7 @@
           <span class="card-value" id="workValue">00:40</span>
         </article>
 
-        <article class="card rest" id="card-rest">
+        <article class="card rest" id="card-rest" role="button" tabindex="0" data-open-setting="rest">
           <div class="card-content">
             <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.4"/><rect x="9" y="7.5" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="12.5" y="7.5" width="2.5" height="9" rx="1" fill="currentColor"/></svg></span>
             <span class="card-title">Отдых</span>
@@ -506,7 +525,7 @@
           <span class="card-value" id="restValue">00:20</span>
         </article>
 
-        <article class="card exercises" id="card-exercise">
+        <article class="card exercises" id="card-exercise" role="button" tabindex="0" data-open-setting="exercises">
           <div class="card-content">
             <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v6l3.5 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
             <span class="card-title">Упражнения</span>
@@ -514,7 +533,7 @@
           <span class="card-value" id="exerciseValue">5</span>
         </article>
 
-        <article class="card rounds" id="card-round">
+        <article class="card rounds" id="card-round" role="button" tabindex="0" data-open-setting="rounds">
           <div class="card-content">
             <span class="icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M19 7v5h-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 13.4A7 7 0 1 1 16.6 6L19 8.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <span class="card-title">Круги</span>
@@ -522,7 +541,7 @@
           <span class="card-value" id="roundValue">3X</span>
         </article>
 
-        <article class="card roundreset" id="card-roundreset">
+        <article class="card roundreset" id="card-roundreset" role="button" tabindex="0" data-open-setting="roundReset">
           <div class="card-content">
             <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <span class="card-title">Сброс круга</span>
@@ -537,7 +556,7 @@
     <div class="drawer-backdrop" id="drawerBackdrop"></div>
     <section class="drawer" aria-label="Настройки таймера">
       <div class="handle"></div>
-      <h2>Настройки</h2>
+      <h2 id="drawerTitle">Настройки</h2>
       <div class="quick-presets">
         <button class="preset" data-preset="tabata">40/20</button>
         <button class="preset" data-preset="hiit">30/15</button>
@@ -563,10 +582,6 @@
       <div class="setting" data-key="roundReset">
         <label>Сброс круга</label>
         <div class="stepper"><button data-step="-5">−</button><span id="set-roundReset">00:30</span><button data-step="5">+</button></div>
-      </div>
-      <div class="setting" data-key="includeRoundReset">
-        <label>Учитывать сброс круга в таймере</label>
-        <div class="stepper"><button data-toggle="includeRoundReset">↻</button><span id="set-includeRoundReset">Нет</span></div>
       </div>
       <div class="setting" data-key="sound">
         <label>Звук и вибрация</label>
@@ -599,7 +614,6 @@
       exercises: 5,
       rounds: 3,
       roundReset: 30,
-      includeRoundReset: false,
       sound: true
     };
 
@@ -615,7 +629,9 @@
 
     function loadConfig() {
       try {
-        return { ...defaultConfig, ...JSON.parse(localStorage.getItem('sportTimerConfig') || '{}') };
+        const stored = JSON.parse(localStorage.getItem('sportTimerConfig') || '{}');
+        delete stored.includeRoundReset;
+        return { ...defaultConfig, ...stored };
       } catch { return { ...defaultConfig }; }
     }
 
@@ -635,11 +651,11 @@
       for (let r = 1; r <= config.rounds; r++) {
         for (let e = 1; e <= config.exercises; e++) {
           items.push({ type: 'work', label: 'Работа', duration: config.work, round: r, exercise: e });
-          if (config.rest > 0 && !(r === config.rounds && e === config.exercises)) {
+          if (config.rest > 0) {
             items.push({ type: 'rest', label: 'Отдых', duration: config.rest, round: r, exercise: e });
           }
         }
-        if (config.includeRoundReset && config.roundReset > 0 && r < config.rounds) {
+        if (config.roundReset > 0 && r < config.rounds) {
           items.push({ type: 'roundreset', label: 'Сброс круга', duration: config.roundReset, round: r, exercise: config.exercises });
         }
       }
@@ -648,7 +664,7 @@
 
     function totalSecondsForDisplay() {
       const base = config.rounds * config.exercises * (config.work + config.rest);
-      const reset = config.includeRoundReset ? Math.max(0, config.rounds - 1) * config.roundReset : 0;
+      const reset = Math.max(0, config.rounds - 1) * config.roundReset;
       return base + reset;
     }
 
@@ -769,7 +785,7 @@
       $('#roundValue').textContent = config.rounds + 'X';
       $('#roundResetValue').textContent = mmss(config.roundReset);
       totalTimeEl.textContent = mmss(totalRemaining || totalSecondsForDisplay());
-      progressNote.textContent = `${config.work}/${config.rest} · ${config.exercises} упражнений · ${config.rounds} круга` + (config.includeRoundReset ? ` · сброс ${config.roundReset} сек` : '');
+      progressNote.textContent = `${config.work}/${config.rest} · ${config.exercises} упр. · ${config.rounds} круг. · сброс ${config.roundReset} сек`;
 
       const current = timeline[phaseIndex];
       clearActiveCards();
@@ -796,7 +812,6 @@
       $('#set-exercises').textContent = String(tempConfig.exercises);
       $('#set-rounds').textContent = tempConfig.rounds + 'X';
       $('#set-roundReset').textContent = mmss(tempConfig.roundReset);
-      $('#set-includeRoundReset').textContent = tempConfig.includeRoundReset ? 'Да' : 'Нет';
       $('#set-sound').textContent = tempConfig.sound ? 'Да' : 'Нет';
     }
 
@@ -808,13 +823,38 @@
       return Math.max(limits[0], Math.min(limits[1], value));
     }
 
-    function openSettings() {
+    const settingNames = {
+      work: 'Работа',
+      rest: 'Отдых',
+      exercises: 'Упражнения',
+      rounds: 'Круги',
+      roundReset: 'Сброс круга'
+    };
+
+    function openSettings(focusKey = null) {
       tempConfig = { ...config };
       renderSettings();
+      document.querySelectorAll('.setting').forEach(row => row.classList.remove('focused'));
+      $('#drawerTitle').textContent = focusKey && settingNames[focusKey] ? `Настроить: ${settingNames[focusKey]}` : 'Настройки';
       document.body.classList.add('drawer-open');
+      if (focusKey) {
+        requestAnimationFrame(() => {
+          const row = document.querySelector(`.setting[data-key="${focusKey}"]`);
+          if (row) {
+            row.classList.add('focused');
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }
+        });
+      }
     }
 
-    function closeSettings() { document.body.classList.remove('drawer-open'); }
+    function closeSettings() {
+      document.body.classList.remove('drawer-open');
+      setTimeout(() => {
+        $('#drawerTitle').textContent = 'Настройки';
+        document.querySelectorAll('.setting').forEach(row => row.classList.remove('focused'));
+      }, 220);
+    }
 
     function applySettings() {
       config = { ...tempConfig };
@@ -851,16 +891,27 @@
     document.querySelectorAll('.preset').forEach(btn => {
       btn.addEventListener('click', () => {
         const p = btn.dataset.preset;
-        if (p === 'tabata') tempConfig = { ...tempConfig, work: 40, rest: 20, exercises: 5, rounds: 3, includeRoundReset: false };
-        if (p === 'hiit') tempConfig = { ...tempConfig, work: 30, rest: 15, exercises: 6, rounds: 3, includeRoundReset: false };
-        if (p === 'emom') tempConfig = { ...tempConfig, work: 60, rest: 0, exercises: 5, rounds: 3, includeRoundReset: false };
+        if (p === 'tabata') tempConfig = { ...tempConfig, work: 40, rest: 20, exercises: 5, rounds: 3, roundReset: 30 };
+        if (p === 'hiit') tempConfig = { ...tempConfig, work: 30, rest: 15, exercises: 6, rounds: 3, roundReset: 30 };
+        if (p === 'emom') tempConfig = { ...tempConfig, work: 60, rest: 0, exercises: 5, rounds: 3, roundReset: 0 };
         renderSettings();
+      });
+    });
+
+    document.querySelectorAll('[data-open-setting]').forEach(card => {
+      const open = () => openSettings(card.dataset.openSetting);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
       });
     });
 
     playPauseBtn.addEventListener('click', () => running ? pauseTimer() : startTimer());
     resetBtn.addEventListener('click', () => resetTimer());
-    $('#openSettings').addEventListener('click', openSettings);
+    $('#openSettings').addEventListener('click', () => openSettings());
     $('#closeSettings').addEventListener('click', closeSettings);
     $('#applySettings').addEventListener('click', applySettings);
     drawerBackdrop.addEventListener('click', closeSettings);
