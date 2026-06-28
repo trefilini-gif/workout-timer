@@ -3,108 +3,877 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
+  <meta name="theme-color" content="#ff2f67" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Таймер" />
   <link rel="manifest" href="manifest.json" />
-  <title>Workout Timer</title>
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>Таймер для тренировок</title>
   <style>
-    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial, sans-serif; }
-    body { margin: 0; min-height: 100vh; background: #111827; color: white; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
-    .app { width: min(420px, 100%); text-align: center; }
-    h1 { margin: 0 0 8px; font-size: 34px; }
-    .sub { margin: 0 0 24px; color: #9ca3af; }
-    .circle { width: min(78vw, 320px); height: min(78vw, 320px); border-radius: 50%; border: 14px solid rgba(255,255,255,.14); display: grid; place-items: center; margin: 0 auto 24px; position: relative; }
-    .circle::before { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 14px solid var(--accent, #22c55e); clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0); opacity: .9; }
-    .phase { font-size: 25px; font-weight: 700; color: var(--accent, #22c55e); }
-    .time { font-size: 74px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; margin: 8px 0; }
-    .round { color: #d1d5db; font-size: 18px; }
-    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
-    button { border: 0; border-radius: 16px; padding: 16px; font-size: 18px; font-weight: 700; color: white; background: #374151; }
-    button.primary { background: #2563eb; }
-    .settings { background: rgba(255,255,255,.08); border-radius: 20px; padding: 16px; display: grid; gap: 14px; }
-    label { display: grid; grid-template-columns: 1fr 120px; gap: 12px; align-items: center; text-align: left; color: #d1d5db; }
-    input { width: 100%; box-sizing: border-box; border-radius: 12px; border: 1px solid rgba(255,255,255,.18); background: #111827; color: white; padding: 12px; font-size: 18px; text-align: center; }
-    .hint { color: #9ca3af; font-size: 13px; margin-top: 16px; line-height: 1.35; }
+    :root {
+      --pink: #ff2f67;
+      --red: #ff4b43;
+      --green: #59df9e;
+      --green-bg: #e9fbf2;
+      --rose: #ff315f;
+      --rose-bg: #ffe4ec;
+      --blue: #527cff;
+      --blue-bg: #e9ecff;
+      --yellow: #f4cf4e;
+      --yellow-bg: #fff8de;
+      --gray-bg: #f2f2f4;
+      --text: #22232a;
+      --muted: #9c9ca4;
+      --card-radius: 18px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; min-height: 100%; background: #ffffff; color: var(--text); }
+    body { overflow-x: hidden; }
+    button, input { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #fff;
+      position: relative;
+    }
+
+    .hero {
+      height: 47vh;
+      min-height: 355px;
+      max-height: 470px;
+      color: white;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
+        linear-gradient(135deg, #ff5743 0%, #ff285d 48%, #f21562 100%);
+      padding: calc(18px + var(--safe-top)) 22px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: -70px;
+      top: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      filter: blur(2px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .menu-btn, .ghost-btn {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      border-radius: 14px;
+    }
+
+    .hamburger {
+      width: 28px;
+      height: 21px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      display: block;
+      height: 4px;
+      border-radius: 4px;
+      background: currentColor;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: .2px;
+      font-weight: 800;
+      text-transform: lowercase;
+    }
+
+    .total-time {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(100% - 80px);
+      font-size: clamp(76px, 22vw, 116px);
+      font-weight: 300;
+      letter-spacing: -5px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 12px 30px rgba(148, 18, 56, .15);
+    }
+
+    .sheet {
+      background: #fff;
+      border-radius: 22px 22px 0 0;
+      margin-top: -58px;
+      min-height: calc(53vh + 58px);
+      padding: 86px 24px calc(20px + var(--safe-bottom));
+      position: relative;
+      z-index: 3;
+      box-shadow: 0 -10px 22px rgba(43, 20, 35, .03);
+    }
+
+    .play-wrap {
+      position: absolute;
+      left: 50%;
+      top: -64px;
+      transform: translateX(-50%);
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 22px rgba(233, 22, 87, .12);
+    }
+
+    .play-btn {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 0;
+      background: #fff;
+      color: var(--pink);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .16s ease;
+    }
+
+    .play-btn:active { transform: scale(.96); }
+
+    .play-icon, .pause-icon {
+      width: 40px;
+      height: 40px;
+      display: block;
+    }
+    .pause-icon { display: none; }
+    .running .play-icon { display: none; }
+    .running .pause-icon { display: block; }
+
+    .reset-btn {
+      position: absolute;
+      right: 22px;
+      top: -28px;
+      width: 58px;
+      height: 58px;
+      border-radius: 19px;
+      border: 0;
+      background: rgba(255,255,255,.95);
+      color: var(--pink);
+      box-shadow: 0 8px 18px rgba(0,0,0,.10);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .phase-line {
+      text-align: center;
+      margin-top: -34px;
+      margin-bottom: 18px;
+      height: 32px;
+      color: #7a7a84;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .phase-line strong { color: var(--text); }
+
+    .card-list { display: grid; gap: 12px; }
+
+    .card {
+      height: 84px;
+      border-radius: var(--card-radius);
+      padding: 0 26px 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .card.disabled { background: #eeeeef; color: #9b9ba2; }
+    .card.work { background: var(--green-bg); }
+    .card.rest { background: var(--rose-bg); }
+    .card.exercises { background: var(--gray-bg); }
+    .card.rounds { background: var(--blue-bg); }
+    .card.roundreset { background: var(--yellow-bg); }
+
+    .card.active {
+      transform: scale(1.018);
+      box-shadow: 0 14px 26px rgba(0,0,0,.08);
+    }
+
+    .card.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--progress, 0%);
+      opacity: .28;
+      background: currentColor;
+      transition: width .25s linear;
+    }
+
+    .card-content, .card-value { position: relative; z-index: 2; }
+
+    .card-content {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 22px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .icon {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      display: grid;
+      place-items: center;
+    }
+
+    .card-value {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .work { color: var(--green); }
+    .rest { color: var(--rose); }
+    .rounds { color: var(--blue); }
+    .roundreset { color: var(--yellow); }
+    .exercises { color: #aaa; }
+    .card .card-title { color: var(--text); }
+    .card.disabled .card-title { color: #8d8d93; }
+
+    .progress-note {
+      margin: 16px 2px 0;
+      color: #858590;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 22, 30, .34);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+
+    .drawer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 21;
+      background: #fff;
+      border-radius: 26px 26px 0 0;
+      padding: 18px 22px calc(20px + var(--safe-bottom));
+      transform: translateY(110%);
+      transition: transform .24s ease;
+      max-height: 86vh;
+      overflow-y: auto;
+      box-shadow: 0 -18px 50px rgba(0,0,0,.18);
+    }
+
+    .drawer-open .drawer-backdrop { opacity: 1; pointer-events: auto; }
+    .drawer-open .drawer { transform: translateY(0); }
+
+    .handle {
+      width: 42px;
+      height: 5px;
+      border-radius: 9px;
+      background: #d8d8de;
+      margin: 0 auto 16px;
+    }
+
+    .drawer h2 {
+      margin: 0 0 14px;
+      font-size: 25px;
+      letter-spacing: -.5px;
+    }
+
+    .setting {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      min-height: 64px;
+      border-bottom: 1px solid #efeff2;
+    }
+
+    .setting label {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2d2d34;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 18px;
+      background: #f3f3f6;
+      padding: 6px;
+    }
+
+    .stepper button {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+      color: #33343b;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 1px 0 rgba(0,0,0,.06);
+    }
+
+    .stepper span {
+      min-width: 60px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .drawer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .primary, .secondary {
+      height: 54px;
+      border-radius: 18px;
+      border: 0;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .primary {
+      color: #fff;
+      background: linear-gradient(135deg, #ff5544, #ff2b64);
+      box-shadow: 0 10px 22px rgba(255, 48, 93, .22);
+    }
+
+    .secondary { color: #33343b; background: #f0f0f3; }
+
+    .quick-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+
+    .preset {
+      height: 48px;
+      border-radius: 15px;
+      border: 0;
+      background: #f4f4f6;
+      color: #292a31;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(90px);
+      background: rgba(31, 31, 38, .92);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-size: 15px;
+      z-index: 30;
+      opacity: 0;
+      transition: .24s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 380px) {
+      .hero { min-height: 330px; }
+      .sheet { padding-left: 16px; padding-right: 16px; }
+      .card { height: 76px; padding-left: 20px; padding-right: 20px; }
+      .card-title { font-size: 21px; }
+      .card-value { font-size: 25px; }
+      h1 { font-size: 21px; }
+      .play-wrap { width: 112px; height: 112px; top: -56px; }
+      .play-btn { width: 84px; height: 84px; }
+      .total-time { letter-spacing: -3px; }
+    }
   </style>
 </head>
 <body>
-  <main class="app">
-    <h1>Workout Timer</h1>
-    <p class="sub">Работа / отдых / раунды</p>
+  <main id="app" class="app">
+    <section class="hero">
+      <div class="topbar">
+        <button class="menu-btn" id="openSettings" aria-label="Открыть настройки">
+          <span class="hamburger"><span></span><span></span><span></span></span>
+        </button>
+        <h1>таймер для тренировок</h1>
+      </div>
+      <div class="total-time" id="totalTime">15:00</div>
+    </section>
 
-    <section class="circle" id="circle">
-      <div>
-        <div class="phase" id="phase">Готов к старту</div>
-        <div class="time" id="time">00:40</div>
-        <div class="round" id="round">Раунд 1 из 5</div>
+    <section class="sheet">
+      <div class="play-wrap">
+        <button class="play-btn" id="playPause" aria-label="Старт / пауза">
+          <svg class="play-icon" viewBox="0 0 50 50" aria-hidden="true"><path fill="currentColor" d="M18 12.5c0-2.3 2.5-3.8 4.5-2.6l19.2 11.5c1.9 1.1 1.9 3.9 0 5L22.5 38c-2 1.2-4.5-.2-4.5-2.6v-23z"/></svg>
+          <svg class="pause-icon" viewBox="0 0 50 50" aria-hidden="true"><rect x="15" y="11" width="8" height="28" rx="3" fill="currentColor"/><rect x="28" y="11" width="8" height="28" rx="3" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <button class="reset-btn" id="resetBtn" aria-label="Сбросить таймер">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7v5h-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.2 13.3A7.5 7.5 0 1 1 17.3 6L20 8.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="phase-line" id="phaseLine">Готово к тренировке</div>
+
+      <div class="card-list">
+        <article class="card disabled" id="historyCard">
+          <div class="card-content">
+            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4.5 9h15M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span class="card-title">Загрузить Предыдущие Трениров...</span>
+          </div>
+          <span class="card-value">»</span>
+        </article>
+
+        <article class="card work" id="card-work">
+          <div class="card-content">
+            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.4"/><path d="M10 8.8v6.4l5-3.2-5-3.2z" fill="currentColor"/></svg></span>
+            <span class="card-title">Работа</span>
+          </div>
+          <span class="card-value" id="workValue">00:40</span>
+        </article>
+
+        <article class="card rest" id="card-rest">
+          <div class="card-content">
+            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.4"/><rect x="9" y="7.5" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="12.5" y="7.5" width="2.5" height="9" rx="1" fill="currentColor"/></svg></span>
+            <span class="card-title">Отдых</span>
+          </div>
+          <span class="card-value" id="restValue">00:20</span>
+        </article>
+
+        <article class="card exercises" id="card-exercise">
+          <div class="card-content">
+            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v6l3.5 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span class="card-title">Упражнения</span>
+          </div>
+          <span class="card-value" id="exerciseValue">5</span>
+        </article>
+
+        <article class="card rounds" id="card-round">
+          <div class="card-content">
+            <span class="icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M19 7v5h-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 13.4A7 7 0 1 1 16.6 6L19 8.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="card-title">Круги</span>
+          </div>
+          <span class="card-value" id="roundValue">3X</span>
+        </article>
+
+        <article class="card roundreset" id="card-roundreset">
+          <div class="card-content">
+            <span class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="card-title">Сброс круга</span>
+          </div>
+          <span class="card-value" id="roundResetValue">00:30</span>
+        </article>
+      </div>
+
+      <div class="progress-note" id="progressNote">40/20 · 5 упражнений · 3 круга</div>
+    </section>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <section class="drawer" aria-label="Настройки таймера">
+      <div class="handle"></div>
+      <h2>Настройки</h2>
+      <div class="quick-presets">
+        <button class="preset" data-preset="tabata">40/20</button>
+        <button class="preset" data-preset="hiit">30/15</button>
+        <button class="preset" data-preset="emom">60/0</button>
+      </div>
+
+      <div class="setting" data-key="work">
+        <label>Работа</label>
+        <div class="stepper"><button data-step="-5">−</button><span id="set-work">00:40</span><button data-step="5">+</button></div>
+      </div>
+      <div class="setting" data-key="rest">
+        <label>Отдых</label>
+        <div class="stepper"><button data-step="-5">−</button><span id="set-rest">00:20</span><button data-step="5">+</button></div>
+      </div>
+      <div class="setting" data-key="exercises">
+        <label>Упражнения</label>
+        <div class="stepper"><button data-step="-1">−</button><span id="set-exercises">5</span><button data-step="1">+</button></div>
+      </div>
+      <div class="setting" data-key="rounds">
+        <label>Круги</label>
+        <div class="stepper"><button data-step="-1">−</button><span id="set-rounds">3X</span><button data-step="1">+</button></div>
+      </div>
+      <div class="setting" data-key="roundReset">
+        <label>Сброс круга</label>
+        <div class="stepper"><button data-step="-5">−</button><span id="set-roundReset">00:30</span><button data-step="5">+</button></div>
+      </div>
+      <div class="setting" data-key="includeRoundReset">
+        <label>Учитывать сброс круга в таймере</label>
+        <div class="stepper"><button data-toggle="includeRoundReset">↻</button><span id="set-includeRoundReset">Нет</span></div>
+      </div>
+      <div class="setting" data-key="sound">
+        <label>Звук и вибрация</label>
+        <div class="stepper"><button data-toggle="sound">↻</button><span id="set-sound">Да</span></div>
+      </div>
+
+      <div class="drawer-actions">
+        <button class="secondary" id="closeSettings">Закрыть</button>
+        <button class="primary" id="applySettings">Применить</button>
       </div>
     </section>
 
-    <div class="buttons">
-      <button class="primary" id="start">Старт</button>
-      <button id="reset">Сброс</button>
-    </div>
-
-    <section class="settings">
-      <label>Работа, сек <input id="work" type="number" min="5" max="600" step="5" value="40"></label>
-      <label>Отдых, сек <input id="rest" type="number" min="0" max="300" step="5" value="20"></label>
-      <label>Раунды <input id="rounds" type="number" min="1" max="30" step="1" value="5"></label>
-    </section>
-
-    <p class="hint">На iPhone можно открыть файл/страницу в Safari и добавить на экран «Домой». Для полноценного приложения лучше использовать SwiftUI-версию из архива.</p>
+    <div class="toast" id="toast">Сохранено</div>
   </main>
 
   <script>
-    const el = id => document.getElementById(id);
-    const state = { running: false, phase: 'idle', work: 40, rest: 20, rounds: 5, current: 1, left: 40, timer: null };
+    const $ = (sel) => document.querySelector(sel);
+    const app = $('#app');
+    const totalTimeEl = $('#totalTime');
+    const playPauseBtn = $('#playPause');
+    const resetBtn = $('#resetBtn');
+    const phaseLine = $('#phaseLine');
+    const progressNote = $('#progressNote');
+    const drawerBackdrop = $('#drawerBackdrop');
+    const toast = $('#toast');
 
-    function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
-    function beep() {
-      if (navigator.vibrate) navigator.vibrate(160);
+    const defaultConfig = {
+      work: 40,
+      rest: 20,
+      exercises: 5,
+      rounds: 3,
+      roundReset: 30,
+      includeRoundReset: false,
+      sound: true
+    };
+
+    let config = loadConfig();
+    let tempConfig = { ...config };
+    let timeline = [];
+    let phaseIndex = 0;
+    let phaseRemaining = 0;
+    let totalRemaining = 0;
+    let running = false;
+    let intervalId = null;
+    let audioCtx = null;
+
+    function loadConfig() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.frequency.value = 880; gain.gain.value = 0.08;
-        osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 180);
-      } catch (_) {}
+        return { ...defaultConfig, ...JSON.parse(localStorage.getItem('sportTimerConfig') || '{}') };
+      } catch { return { ...defaultConfig }; }
     }
-    function readSettings() {
-      state.work = Math.max(5, Number(el('work').value || 40));
-      state.rest = Math.max(0, Number(el('rest').value || 20));
-      state.rounds = Math.max(1, Number(el('rounds').value || 5));
-      if (!state.running && (state.phase === 'idle' || state.phase === 'finished')) state.left = state.work;
-    }
-    function render() {
-      el('phase').textContent = state.phase === 'work' ? 'Работа' : state.phase === 'rest' ? 'Отдых' : state.phase === 'finished' ? 'Финиш' : 'Готов к старту';
-      el('time').textContent = fmt(state.left);
-      el('round').textContent = `Раунд ${state.current} из ${state.rounds}`;
-      el('start').textContent = state.running ? 'Пауза' : 'Старт';
-      document.documentElement.style.setProperty('--accent', state.phase === 'rest' ? '#f59e0b' : '#22c55e');
-    }
-    function startPause() {
-      readSettings();
-      if (state.running) { clearInterval(state.timer); state.running = false; render(); return; }
-      if (state.phase === 'idle' || state.phase === 'finished') { state.phase = 'work'; state.current = 1; state.left = state.work; }
-      state.running = true;
-      state.timer = setInterval(tick, 1000);
-      render();
-    }
-    function tick() {
-      if (state.left > 1) { state.left--; render(); return; }
-      beep();
-      if (state.phase === 'work' && state.rest > 0) { state.phase = 'rest'; state.left = state.rest; }
-      else if (state.current < state.rounds) { state.current++; state.phase = 'work'; state.left = state.work; }
-      else { clearInterval(state.timer); state.running = false; state.phase = 'finished'; state.left = 0; beep(); }
-      render();
-    }
-    function reset() { clearInterval(state.timer); readSettings(); Object.assign(state, { running: false, phase: 'idle', current: 1, left: state.work }); render(); }
 
-    ['work','rest','rounds'].forEach(id => el(id).addEventListener('change', reset));
-    el('start').addEventListener('click', startPause);
-    el('reset').addEventListener('click', reset);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => {});
-    render();
+    function saveConfig() {
+      localStorage.setItem('sportTimerConfig', JSON.stringify(config));
+    }
+
+    function mmss(seconds) {
+      const s = Math.max(0, Math.round(seconds));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+    }
+
+    function buildTimeline() {
+      const items = [];
+      for (let r = 1; r <= config.rounds; r++) {
+        for (let e = 1; e <= config.exercises; e++) {
+          items.push({ type: 'work', label: 'Работа', duration: config.work, round: r, exercise: e });
+          if (config.rest > 0 && !(r === config.rounds && e === config.exercises)) {
+            items.push({ type: 'rest', label: 'Отдых', duration: config.rest, round: r, exercise: e });
+          }
+        }
+        if (config.includeRoundReset && config.roundReset > 0 && r < config.rounds) {
+          items.push({ type: 'roundreset', label: 'Сброс круга', duration: config.roundReset, round: r, exercise: config.exercises });
+        }
+      }
+      return items.filter(x => x.duration > 0);
+    }
+
+    function totalSecondsForDisplay() {
+      const base = config.rounds * config.exercises * (config.work + config.rest);
+      const reset = config.includeRoundReset ? Math.max(0, config.rounds - 1) * config.roundReset : 0;
+      return base + reset;
+    }
+
+    function resetTimer(silent = false) {
+      stopTick();
+      timeline = buildTimeline();
+      phaseIndex = 0;
+      phaseRemaining = timeline[0]?.duration || 0;
+      totalRemaining = totalSecondsForDisplay();
+      running = false;
+      app.classList.remove('running');
+      updateUi();
+      if (!silent) notify('Сброшено');
+    }
+
+    function startTimer() {
+      if (!timeline.length || totalRemaining <= 0) resetTimer(true);
+      running = true;
+      app.classList.add('running');
+      warmAudio();
+      beep(560, 90);
+      tick();
+      intervalId = setInterval(tick, 1000);
+      updateUi();
+    }
+
+    function pauseTimer() {
+      running = false;
+      app.classList.remove('running');
+      stopTick();
+      updateUi();
+    }
+
+    function stopTick() {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = null;
+    }
+
+    function tick() {
+      if (!running) return;
+      if (phaseRemaining <= 0) {
+        phaseIndex++;
+        if (phaseIndex >= timeline.length || totalRemaining <= 0) {
+          finishWorkout();
+          return;
+        }
+        phaseRemaining = timeline[phaseIndex].duration;
+        phaseSignal(timeline[phaseIndex].type);
+      }
+      updateUi();
+      phaseRemaining--;
+      totalRemaining--;
+    }
+
+    function finishWorkout() {
+      stopTick();
+      running = false;
+      app.classList.remove('running');
+      totalRemaining = 0;
+      phaseRemaining = 0;
+      phaseLine.innerHTML = '<strong>Тренировка завершена</strong>';
+      clearActiveCards();
+      totalTimeEl.textContent = '00:00';
+      if (config.sound) {
+        beep(880, 160); setTimeout(() => beep(880, 160), 220); setTimeout(() => beep(880, 260), 440);
+        vibrate([120, 80, 120, 80, 200]);
+      }
+    }
+
+    function phaseSignal(type) {
+      if (!config.sound) return;
+      beep(type === 'work' ? 720 : 420, 120);
+      vibrate(type === 'work' ? 80 : [60, 50, 60]);
+    }
+
+    function warmAudio() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch {}
+    }
+
+    function beep(freq, duration) {
+      if (!config.sound) return;
+      try {
+        warmAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration / 1000);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration / 1000 + 0.02);
+      } catch {}
+    }
+
+    function vibrate(pattern) {
+      if ('vibrate' in navigator) navigator.vibrate(pattern);
+    }
+
+    function clearActiveCards() {
+      ['work','rest','exercise','round','roundreset'].forEach(id => {
+        const c = $('#card-' + id);
+        if (c) {
+          c.classList.remove('active');
+          c.style.setProperty('--progress', '0%');
+        }
+      });
+    }
+
+    function updateUi() {
+      $('#workValue').textContent = mmss(config.work);
+      $('#restValue').textContent = mmss(config.rest);
+      $('#exerciseValue').textContent = String(config.exercises);
+      $('#roundValue').textContent = config.rounds + 'X';
+      $('#roundResetValue').textContent = mmss(config.roundReset);
+      totalTimeEl.textContent = mmss(totalRemaining || totalSecondsForDisplay());
+      progressNote.textContent = `${config.work}/${config.rest} · ${config.exercises} упражнений · ${config.rounds} круга` + (config.includeRoundReset ? ` · сброс ${config.roundReset} сек` : '');
+
+      const current = timeline[phaseIndex];
+      clearActiveCards();
+      if (running && current) {
+        const id = current.type === 'roundreset' ? 'roundreset' : current.type;
+        const card = $('#card-' + id);
+        const progress = ((current.duration - Math.max(phaseRemaining, 0)) / current.duration) * 100;
+        if (card) {
+          card.classList.add('active');
+          card.style.setProperty('--progress', `${Math.min(100, Math.max(0, progress))}%`);
+        }
+        phaseLine.innerHTML = `<strong>${current.label}</strong> · круг ${current.round}/${config.rounds} · упражнение ${current.exercise}/${config.exercises}`;
+      } else if (totalRemaining <= 0 && timeline.length) {
+        phaseLine.innerHTML = '<strong>Тренировка завершена</strong>';
+      } else {
+        phaseLine.textContent = 'Готово к тренировке';
+      }
+      renderSettings();
+    }
+
+    function renderSettings() {
+      $('#set-work').textContent = mmss(tempConfig.work);
+      $('#set-rest').textContent = mmss(tempConfig.rest);
+      $('#set-exercises').textContent = String(tempConfig.exercises);
+      $('#set-rounds').textContent = tempConfig.rounds + 'X';
+      $('#set-roundReset').textContent = mmss(tempConfig.roundReset);
+      $('#set-includeRoundReset').textContent = tempConfig.includeRoundReset ? 'Да' : 'Нет';
+      $('#set-sound').textContent = tempConfig.sound ? 'Да' : 'Нет';
+    }
+
+    function clamp(key, value) {
+      const limits = {
+        work: [5, 600], rest: [0, 600], exercises: [1, 30], rounds: [1, 20], roundReset: [0, 600]
+      }[key];
+      if (!limits) return value;
+      return Math.max(limits[0], Math.min(limits[1], value));
+    }
+
+    function openSettings() {
+      tempConfig = { ...config };
+      renderSettings();
+      document.body.classList.add('drawer-open');
+    }
+
+    function closeSettings() { document.body.classList.remove('drawer-open'); }
+
+    function applySettings() {
+      config = { ...tempConfig };
+      saveConfig();
+      resetTimer(true);
+      closeSettings();
+      notify('Настройки сохранены');
+    }
+
+    function notify(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    document.querySelectorAll('.setting').forEach(row => {
+      row.addEventListener('click', (e) => {
+        const key = row.dataset.key;
+        const stepBtn = e.target.closest('[data-step]');
+        const toggleBtn = e.target.closest('[data-toggle]');
+        if (stepBtn) {
+          const step = Number(stepBtn.dataset.step);
+          tempConfig[key] = clamp(key, Number(tempConfig[key]) + step);
+          renderSettings();
+        }
+        if (toggleBtn) {
+          const toggleKey = toggleBtn.dataset.toggle;
+          tempConfig[toggleKey] = !tempConfig[toggleKey];
+          renderSettings();
+        }
+      });
+    });
+
+    document.querySelectorAll('.preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.preset;
+        if (p === 'tabata') tempConfig = { ...tempConfig, work: 40, rest: 20, exercises: 5, rounds: 3, includeRoundReset: false };
+        if (p === 'hiit') tempConfig = { ...tempConfig, work: 30, rest: 15, exercises: 6, rounds: 3, includeRoundReset: false };
+        if (p === 'emom') tempConfig = { ...tempConfig, work: 60, rest: 0, exercises: 5, rounds: 3, includeRoundReset: false };
+        renderSettings();
+      });
+    });
+
+    playPauseBtn.addEventListener('click', () => running ? pauseTimer() : startTimer());
+    resetBtn.addEventListener('click', () => resetTimer());
+    $('#openSettings').addEventListener('click', openSettings);
+    $('#closeSettings').addEventListener('click', closeSettings);
+    $('#applySettings').addEventListener('click', applySettings);
+    drawerBackdrop.addEventListener('click', closeSettings);
+
+    window.addEventListener('visibilitychange', () => {
+      if (document.hidden && running) pauseTimer();
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+    }
+
+    resetTimer(true);
   </script>
 </body>
 </html>
