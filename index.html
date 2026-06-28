@@ -1046,6 +1046,7 @@
       soft: { work: 620, rest: 360, countdown: 760, finish: 700 },
       sharp: { work: 980, rest: 520, countdown: 1180, finish: 1040 }
     };
+    const BEEP_VOLUME = 1.0;
 
     let config = loadConfig();
     let tempConfig = { ...config };
@@ -1054,7 +1055,10 @@
     let phaseRemaining = 0;
     let totalRemaining = 0;
     let running = false;
+    let preparing = false;
     let intervalId = null;
+    let prepIntervalId = null;
+    let prepRemaining = 0;
     let audioCtx = null;
     let currentEditKey = null;
     let currentEditValue = 0;
@@ -1134,11 +1138,14 @@
 
     function resetTimer(silent = false) {
       stopTick();
+      stopPrep(false);
       timeline = buildTimeline();
       phaseIndex = 0;
       phaseRemaining = timeline[0]?.duration || 0;
       totalRemaining = totalSecondsForDisplay();
       running = false;
+      preparing = false;
+      prepRemaining = 0;
       historySavedForCurrentRun = false;
       workoutStarted = false;
       app.classList.remove('running', 'phase-work', 'phase-rest', 'phase-roundreset');
@@ -1148,17 +1155,59 @@
 
     function startTimer() {
       if (!timeline.length || totalRemaining <= 0) resetTimer(true);
+      if (preparing || running) return;
+      warmAudio();
+
+      if (workoutStarted && totalRemaining > 0) {
+        resumeWorkout();
+        return;
+      }
+
+      startPreparation();
+    }
+
+    function startPreparation() {
+      preparing = true;
+      prepRemaining = 3;
+      app.classList.add('running');
+      updateUi();
+      preparationSignal();
+      prepIntervalId = setInterval(() => {
+        prepRemaining--;
+        if (prepRemaining >= 1) {
+          updateUi();
+          preparationSignal();
+          return;
+        }
+        stopPrep(false);
+        beginWorkout();
+      }, 1000);
+    }
+
+    function beginWorkout() {
+      preparing = false;
       running = true;
       workoutStarted = true;
       app.classList.add('running');
-      warmAudio();
-      beep(560, 90);
-      tick();
-      intervalId = setInterval(tick, 1000);
+      if (timeline[phaseIndex]) phaseSignal(timeline[phaseIndex].type);
       updateUi();
+      intervalId = setInterval(tick, 1000);
+    }
+
+    function resumeWorkout() {
+      running = true;
+      app.classList.add('running');
+      updateUi();
+      intervalId = setInterval(tick, 1000);
     }
 
     function pauseTimer() {
+      if (preparing) {
+        stopPrep(true);
+        workoutStarted = false;
+        updateUi();
+        return;
+      }
       running = false;
       app.classList.remove('running');
       stopTick();
@@ -1168,6 +1217,20 @@
     function stopTick() {
       if (intervalId) clearInterval(intervalId);
       intervalId = null;
+    }
+
+    function stopPrep(removeRunningClass = true) {
+      if (prepIntervalId) clearInterval(prepIntervalId);
+      prepIntervalId = null;
+      preparing = false;
+      prepRemaining = 0;
+      if (removeRunningClass && !running) app.classList.remove('running');
+    }
+
+    function prepPhrase(secondsLeft) {
+      if (secondsLeft === 3) return 'На старт';
+      if (secondsLeft === 2) return 'Внимание';
+      return 'Марш';
     }
 
     function tick() {
@@ -1192,6 +1255,7 @@
 
     function finishWorkout() {
       stopTick();
+      stopPrep(false);
       running = false;
       workoutStarted = false;
       app.classList.remove('running', 'phase-work', 'phase-rest', 'phase-roundreset');
@@ -1304,10 +1368,35 @@
       vibrate(type === 'work' ? 80 : [60, 50, 60]);
     }
 
+    function preparationSignal() {
+      if (!config.sound) return;
+      const phrase = prepPhrase(prepRemaining);
+      if (config.voice) speakPhrase(phrase);
+      else beep(soundProfiles[config.soundProfile]?.countdown || 980, 180);
+      vibrate(prepRemaining === 1 ? [80, 50, 120] : 70);
+    }
+
     function countdownSignal(secondsLeft) {
       if (!config.sound) return;
       if (config.voice) speakCountdown(secondsLeft);
       else beep(soundProfiles[config.soundProfile]?.countdown || 980, secondsLeft === 1 ? 120 : 80);
+    }
+
+    function speakPhrase(phrase) {
+      try {
+        if (!('speechSynthesis' in window)) {
+          beep(soundProfiles[config.soundProfile]?.countdown || 980, 110);
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(phrase);
+        utterance.lang = 'ru-RU';
+        utterance.rate = 1.05;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        beep(soundProfiles[config.soundProfile]?.countdown || 980, 110);
+      }
     }
 
     function speakCountdown(secondsLeft) {
@@ -1317,7 +1406,7 @@
           return;
         }
         window.speechSynthesis.cancel();
-        const phrase = secondsLeft === 1 ? 'Старт' : String(secondsLeft);
+        const phrase = secondsLeft === 1 ? 'Марш' : String(secondsLeft);
         const utterance = new SpeechSynthesisUtterance(phrase);
         utterance.lang = 'ru-RU';
         utterance.rate = 1.05;
@@ -1341,10 +1430,10 @@
         warmAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'sine';
+        osc.type = config.soundProfile === 'soft' ? 'sine' : 'square';
         osc.frequency.value = freq;
         gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.015);
+        gain.gain.exponentialRampToValueAtTime(BEEP_VOLUME, audioCtx.currentTime + 0.015);
         gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration / 1000);
         osc.connect(gain).connect(audioCtx.destination);
         osc.start();
@@ -1363,6 +1452,21 @@
       app.classList.remove('phase-work', 'phase-rest', 'phase-roundreset');
       const themeMeta = document.querySelector('meta[name="theme-color"]');
       if (themeMeta) themeMeta.setAttribute('content', '#ff2f67');
+      if (preparing) {
+        const totalTimeForBadge = totalRemaining > 0 ? totalRemaining : totalSecondsForDisplay();
+        totalTimeEl.textContent = mmss(prepRemaining);
+        totalRemainingBadge.innerHTML = `<span>Всего</span> ${mmss(totalTimeForBadge)}`;
+        $('#workValue').textContent = mmss(config.work);
+        $('#restValue').textContent = mmss(config.rest);
+        $('#exerciseValue').textContent = String(config.exercises);
+        $('#roundValue').textContent = config.rounds + 'X';
+        $('#roundResetValue').textContent = mmss(config.roundReset);
+        progressNote.textContent = `${config.work}/${config.rest} · ${config.exercises} упр. · ${config.rounds} круг. · сброс ${config.roundReset} сек`;
+        clearActiveCards();
+        phaseLine.innerHTML = `<strong>${prepPhrase(prepRemaining)}</strong> · готовность`;
+        renderSettings();
+        return;
+      }
       if (workoutStarted && totalRemaining > 0 && current) {
         if (current.type === 'work') {
           app.classList.add('phase-work');
@@ -1631,7 +1735,7 @@
       renderSettings();
     });
 
-    playPauseBtn.addEventListener('click', () => running ? pauseTimer() : startTimer());
+    playPauseBtn.addEventListener('click', () => (running || preparing) ? pauseTimer() : startTimer());
     resetBtn.addEventListener('click', () => resetTimer());
     $('#openSettings').addEventListener('click', () => openSettings());
     $('#closeSettings').addEventListener('click', closeSettings);
@@ -1651,7 +1755,7 @@
     });
 
     window.addEventListener('visibilitychange', () => {
-      if (document.hidden && running) pauseTimer();
+      if (document.hidden && (running || preparing)) pauseTimer();
     });
 
     if ('serviceWorker' in navigator) {
