@@ -249,12 +249,22 @@
       margin-top: 8px;
       margin-bottom: 10px;
       height: 26px;
-      color: #7a7a84;
+      color: rgba(255,255,255,.96);
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
+      line-height: 26px;
+      position: relative;
+      z-index: 7;
+      transform: translateY(-122px);
+      text-shadow: 0 2px 12px rgba(0,0,0,.18);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 12px;
+      pointer-events: none;
     }
 
-    .phase-line strong { color: var(--text); }
+    .phase-line strong { color: inherit; }
 
     .card-list { display: grid; gap: 10px; }
 
@@ -755,6 +765,8 @@
     body.dark-theme .play-wrap,
     body.dark-theme .play-btn,
     body.dark-theme .reset-btn { background: #1b1c24; }
+    body.dark-theme .phase-line { color: rgba(255,255,255,.96); }
+    body.dark-theme .phase-line strong { color: inherit; }
 
     .template-grid {
       display: grid;
@@ -817,7 +829,7 @@
       .play-wrap { width: 92px; height: 92px; top: -22px; }
       .play-btn { width: 70px; height: 70px; }
       .reset-btn { width: 48px; height: 48px; border-radius: 16px; top: 8px; right: 14px; }
-      .phase-line { margin-top: 10px; margin-bottom: 8px; font-size: 14px; height: 22px; }
+      .phase-line { margin-top: 10px; margin-bottom: 8px; font-size: 14px; height: 22px; line-height: 22px; transform: translateY(-112px); }
       .progress-note { margin-top: 8px; font-size: 13px; }
     }
 
