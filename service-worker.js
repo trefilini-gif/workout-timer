@@ -1,4 +1,4 @@
-const CACHE_NAME = 'workout-card-timer-v2';
+const CACHE_NAME = 'workout-card-timer-v5';
 const FILES = [
   './',
   './index.html',
