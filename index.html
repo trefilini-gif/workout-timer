@@ -153,6 +153,31 @@
       text-shadow: 0 12px 30px rgba(148, 18, 56, .15);
     }
 
+
+    .total-remaining {
+      position: absolute;
+      right: 18px;
+      top: calc(12px + var(--safe-top));
+      z-index: 4;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .18);
+      color: rgba(255, 255, 255, .94);
+      font-size: 13px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .1px;
+      font-variant-numeric: tabular-nums;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+    }
+
+    .total-remaining span {
+      opacity: .84;
+      font-weight: 700;
+    }
+
     .sheet {
       background: #fff;
       border-radius: 22px 22px 0 0;
@@ -788,6 +813,7 @@
       h1 { font-size: 20px; }
       .topbar { height: 38px; }
       .total-time { font-size: clamp(58px, 18vw, 88px); letter-spacing: -2px; padding-top: 8px; padding-bottom: 42px; }
+      .total-remaining { top: calc(10px + var(--safe-top)); right: 14px; font-size: 12px; padding: 6px 8px; }
       .play-wrap { width: 92px; height: 92px; top: -22px; }
       .play-btn { width: 70px; height: 70px; }
       .reset-btn { width: 48px; height: 48px; border-radius: 16px; top: 8px; right: 14px; }
@@ -809,7 +835,8 @@
         </button>
         <h1>таймер для тренировок</h1>
       </div>
-      <div class="total-time" id="totalTime">15:00</div>
+      <div class="total-remaining" id="totalRemainingBadge"><span>Всего</span> 15:00</div>
+      <div class="total-time" id="totalTime">00:40</div>
     </section>
 
     <section class="sheet">
@@ -955,6 +982,7 @@
 
     const app = $('#app');
     const totalTimeEl = $('#totalTime');
+    const totalRemainingBadge = $('#totalRemainingBadge');
     const playPauseBtn = $('#playPause');
     const resetBtn = $('#resetBtn');
     const phaseLine = $('#phaseLine');
@@ -1335,8 +1363,20 @@
       $('#exerciseValue').textContent = String(config.exercises);
       $('#roundValue').textContent = config.rounds + 'X';
       $('#roundResetValue').textContent = current && current.type === 'roundreset' ? mmss(currentRemaining) : mmss(config.roundReset);
-      totalTimeEl.textContent = mmss(totalRemaining > 0 ? totalRemaining : totalSecondsForDisplay());
-      if (totalRemaining === 0 && !running && historySavedForCurrentRun) totalTimeEl.textContent = '00:00';
+
+      const phaseTimeForMainDisplay = current
+        ? (workoutStarted ? currentRemaining : current.duration)
+        : 0;
+      const totalTimeForBadge = totalRemaining > 0 ? totalRemaining : totalSecondsForDisplay();
+
+      totalTimeEl.textContent = mmss(phaseTimeForMainDisplay);
+      totalRemainingBadge.innerHTML = `<span>Всего</span> ${mmss(totalTimeForBadge)}`;
+
+      if (totalRemaining === 0 && !running && historySavedForCurrentRun) {
+        totalTimeEl.textContent = '00:00';
+        totalRemainingBadge.innerHTML = '<span>Всего</span> 00:00';
+      }
+
       progressNote.textContent = `${config.work}/${config.rest} · ${config.exercises} упр. · ${config.rounds} круг. · сброс ${config.roundReset} сек`;
 
       clearActiveCards();
