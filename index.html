@@ -97,6 +97,7 @@
       height: 42px;
       position: relative;
       z-index: 2;
+      padding: 0 132px 0 44px;
     }
 
     .menu-btn, .ghost-btn {
@@ -130,11 +131,16 @@
 
     h1 {
       margin: 0;
-      font-size: 22px;
+      width: 100%;
+      text-align: center;
+      font-size: 21px;
       line-height: 1.15;
       letter-spacing: .2px;
       font-weight: 800;
       text-transform: lowercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .total-time {
@@ -156,10 +162,10 @@
 
     .total-remaining {
       position: absolute;
-      right: 18px;
-      top: calc(12px + var(--safe-top));
+      right: 14px;
+      top: calc(10px + var(--safe-top));
       z-index: 4;
-      padding: 7px 10px;
+      padding: 7px 9px;
       border-radius: 999px;
       background: rgba(255, 255, 255, .18);
       color: rgba(255, 255, 255, .94);
@@ -183,7 +189,7 @@
       border-radius: 22px 22px 0 0;
       margin-top: -42px;
       min-height: calc(69svh + 42px);
-      padding: 62px 20px calc(12px + var(--safe-bottom));
+      padding: 96px 20px calc(12px + var(--safe-bottom));
       position: relative;
       z-index: 3;
       box-shadow: 0 -10px 22px rgba(43, 20, 35, .03);
@@ -246,25 +252,27 @@
 
     .phase-line {
       text-align: center;
-      margin-top: 8px;
-      margin-bottom: 10px;
-      height: 26px;
-      color: rgba(255,255,255,.96);
+      margin-top: 0;
+      margin-bottom: 12px;
+      min-height: 36px;
+      color: #6d6e79;
       font-size: 15px;
       font-weight: 800;
-      line-height: 26px;
+      line-height: 1.25;
       position: relative;
       z-index: 7;
-      transform: translateY(-122px);
-      text-shadow: 0 2px 12px rgba(0,0,0,.18);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-shadow: none;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
       padding: 0 12px;
       pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .phase-line strong { color: inherit; }
+    .phase-line strong { color: var(--text); }
 
     .card-list { display: grid; gap: 10px; }
 
@@ -765,8 +773,8 @@
     body.dark-theme .play-wrap,
     body.dark-theme .play-btn,
     body.dark-theme .reset-btn { background: #1b1c24; }
-    body.dark-theme .phase-line { color: rgba(255,255,255,.96); }
-    body.dark-theme .phase-line strong { color: inherit; }
+    body.dark-theme .phase-line { color: #b7b7c2; }
+    body.dark-theme .phase-line strong { color: #f6f6f8; }
 
     .template-grid {
       display: grid;
@@ -814,7 +822,7 @@
 
     @media (max-width: 380px), (max-height: 760px) {
       .hero { min-height: 200px; height: 29svh; }
-      .sheet { margin-top: -36px; padding: 54px 14px calc(8px + var(--safe-bottom)); }
+      .sheet { margin-top: -36px; padding: 82px 14px calc(8px + var(--safe-bottom)); }
       .card-list { gap: 8px; }
       .card { height: 66px; padding-left: 18px; padding-right: 18px; border-radius: 16px; }
       .card-content { gap: 14px; }
@@ -822,14 +830,14 @@
       .icon svg { width: 28px; height: 28px; }
       .card-title { font-size: 19px; }
       .card-value { font-size: 22px; }
-      h1 { font-size: 20px; }
-      .topbar { height: 38px; }
+      h1 { font-size: 18px; }
+      .topbar { height: 38px; padding: 0 112px 0 42px; }
       .total-time { font-size: clamp(58px, 18vw, 88px); letter-spacing: -2px; padding-top: 8px; padding-bottom: 42px; }
-      .total-remaining { top: calc(10px + var(--safe-top)); right: 14px; font-size: 12px; padding: 6px 8px; }
+      .total-remaining { top: calc(10px + var(--safe-top)); right: 12px; font-size: 11px; padding: 6px 8px; }
       .play-wrap { width: 92px; height: 92px; top: -22px; }
       .play-btn { width: 70px; height: 70px; }
       .reset-btn { width: 48px; height: 48px; border-radius: 16px; top: 8px; right: 14px; }
-      .phase-line { margin-top: 10px; margin-bottom: 8px; font-size: 14px; height: 22px; line-height: 22px; transform: translateY(-112px); }
+      .phase-line { margin-top: 0; margin-bottom: 8px; min-height: 32px; font-size: 13px; line-height: 1.2; padding: 0 8px; }
       .progress-note { margin-top: 8px; font-size: 13px; }
     }
 
