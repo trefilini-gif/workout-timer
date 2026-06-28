@@ -54,6 +54,28 @@
       padding: calc(8px + var(--safe-top)) 20px 0;
       position: relative;
       overflow: hidden;
+      transition: background .28s ease, box-shadow .28s ease;
+    }
+
+    .app.phase-work .hero {
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
+        linear-gradient(135deg, #2ad37f 0%, #19bd6c 48%, #079a56 100%);
+      box-shadow: inset 0 -40px 80px rgba(0, 102, 52, .10);
+    }
+
+    .app.phase-rest .hero {
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
+        linear-gradient(135deg, #ff5948 0%, #ff263f 48%, #d70f2d 100%);
+      box-shadow: inset 0 -40px 80px rgba(130, 0, 24, .12);
+    }
+
+    .app.phase-roundreset .hero {
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.22), rgba(255,255,255,0) 26%),
+        linear-gradient(135deg, #f6d75a 0%, #f0b83a 48%, #e49921 100%);
+      box-shadow: inset 0 -40px 80px rgba(132, 82, 0, .12);
     }
 
     .hero::after {
@@ -989,6 +1011,7 @@
     let currentEditKey = null;
     let currentEditValue = 0;
     let historySavedForCurrentRun = false;
+    let workoutStarted = false;
 
     function loadConfig() {
       try {
@@ -1069,7 +1092,8 @@
       totalRemaining = totalSecondsForDisplay();
       running = false;
       historySavedForCurrentRun = false;
-      app.classList.remove('running');
+      workoutStarted = false;
+      app.classList.remove('running', 'phase-work', 'phase-rest', 'phase-roundreset');
       updateUi();
       if (!silent) notify('Сброшено');
     }
@@ -1077,6 +1101,7 @@
     function startTimer() {
       if (!timeline.length || totalRemaining <= 0) resetTimer(true);
       running = true;
+      workoutStarted = true;
       app.classList.add('running');
       warmAudio();
       beep(560, 90);
@@ -1120,7 +1145,8 @@
     function finishWorkout() {
       stopTick();
       running = false;
-      app.classList.remove('running');
+      workoutStarted = false;
+      app.classList.remove('running', 'phase-work', 'phase-rest', 'phase-roundreset');
       totalRemaining = 0;
       phaseRemaining = 0;
       phaseLine.innerHTML = '<strong>Тренировка завершена</strong>';
@@ -1285,6 +1311,24 @@
     function updateUi() {
       const current = timeline[phaseIndex];
       const currentRemaining = Math.max(0, phaseRemaining);
+
+      app.classList.remove('phase-work', 'phase-rest', 'phase-roundreset');
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) themeMeta.setAttribute('content', '#ff2f67');
+      if (workoutStarted && totalRemaining > 0 && current) {
+        if (current.type === 'work') {
+          app.classList.add('phase-work');
+          if (themeMeta) themeMeta.setAttribute('content', '#19bd6c');
+        }
+        if (current.type === 'rest') {
+          app.classList.add('phase-rest');
+          if (themeMeta) themeMeta.setAttribute('content', '#ff263f');
+        }
+        if (current.type === 'roundreset') {
+          app.classList.add('phase-roundreset');
+          if (themeMeta) themeMeta.setAttribute('content', '#f0b83a');
+        }
+      }
 
       $('#workValue').textContent = current && current.type === 'work' ? mmss(currentRemaining) : mmss(config.work);
       $('#restValue').textContent = current && current.type === 'rest' ? mmss(currentRemaining) : mmss(config.rest);
